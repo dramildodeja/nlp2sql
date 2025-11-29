@@ -1,6 +1,6 @@
 {
   "name": "@dramildodeja/nlp2sql",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Convert natural language into SQL or NoSQL queries using multiple AI providers",
   "main": "backend/index.js",
   "bin": {
