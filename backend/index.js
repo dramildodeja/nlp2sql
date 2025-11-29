@@ -1,52 +1,64 @@
-const axios = require('axios');
 const prettyjson = require('prettyjson');
+const { OpenAI } = require('openai');
 
+// Available models
 const MODELS = {
-  default: 'gemini-2.5',
-  flash: 'gemini-2.5-flash',
-  lite: 'gemini-2.5-flash-lite'
+  default: 'gpt-3.5-turbo', // free-tier default
+  gpt35: 'gpt-3.5-turbo',
+  gpt4: 'gpt-4',
 };
 
-function detectQueryType(schema) {
+/**
+ * Detect query type from schema or type hint
+ * @param {string} schema - Database schema
+ * @param {string} typeHint - Optional: 'sql', 'nosql', 'soql'
+ * @returns {string} query type
+ */
+function detectQueryType(schema, typeHint) {
+  if (typeHint) return typeHint.toLowerCase();
   const lower = schema.toLowerCase();
-  if (lower.includes('mongo') || lower.includes('nosql')) return 'NoSQL';
-  return 'SQL';
+  if (lower.includes('mongo') || lower.includes('nosql')) return 'nosql';
+  if (lower.includes('salesforce') || lower.includes('soql')) return 'soql';
+  return 'sql';
 }
 
-async function generateQuery(dbSchema, apiKey, text, model = MODELS.default, provider = 'google') {
-  const queryType = detectQueryType(dbSchema);
+/**
+ * Generate query using OpenAI
+ * @param {string} dbSchema - Database schema
+ * @param {string} apiKey - OpenAI API key
+ * @param {string} text - Natural language description
+ * @param {string} model - OpenAI model to use
+ * @param {string} typeHint - Optional query type hint
+ * @returns {Promise<Object>} { queryType, output }
+ */
+async function generateQuery(dbSchema, apiKey, text, model = MODELS.default, typeHint) {
+  const queryType = detectQueryType(dbSchema, typeHint);
 
-  if (provider === 'google') {
-    const headers = { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
-    const payload = {
+  if (!apiKey) throw new Error('OpenAI API key is required.');
+
+  const openai = new OpenAI({ apiKey });
+
+  const prompt = `Convert this text into a ${queryType.toUpperCase()} query.
+DB Schema: ${dbSchema}
+Text: ${text}`;
+
+  try {
+    const result = await openai.chat.completions.create({
       model,
-      prompt: `Convert this text to a ${queryType} query.\nDB Schema: ${dbSchema}\nText: ${text}`,
-      temperature: 0.2
-    };
-    try {
-      const response = await axios.post(`https://api.generativeai.google/v1beta/models/${model}:generateText`, payload, { headers });
-      return { queryType, output: response.data.output_text || response.data.choices?.[0]?.text || 'No output returned' };
-    } catch (err) {
-      throw new Error(err.response?.data?.error?.message || err.message);
-    }
-  }
-  else if (provider === 'openai') {
-    const OpenAI = require('openai');
-    const openai = new OpenAI({ apiKey });
-    try {
-      const result = await openai.chat.completions.create({
-        model,
-        messages: [{ role: 'user', content: `Convert this text to a ${queryType} query.\nDB Schema: ${dbSchema}\nText: ${text}` }]
-      });
-      return { queryType, output: result.choices[0].message.content };
-    } catch (err) {
-      throw new Error(err.message);
-    }
-  } else {
-    throw new Error('Unsupported provider. Use "google" or "openai".');
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    return { queryType, output: result.choices[0].message.content };
+  } catch (err) {
+    throw new Error(err.response?.data?.error?.message || err.message);
   }
 }
 
+/**
+ * Pretty-print query output
+ * @param {Object} queryObj
+ * @returns {string}
+ */
 function prettyPrint(queryObj) {
   return prettyjson.render(queryObj, { keysColor: 'cyan', stringColor: 'green' });
 }

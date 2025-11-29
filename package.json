@@ -1,7 +1,7 @@
 {
   "name": "@dramildodeja/nlp2sql",
-  "version": "1.7.0",
-  "description": "Convert natural language into SQL or NoSQL queries using multiple AI providers",
+  "version": "1.8.0",
+  "description": "Convert natural language into SQL or NoSQL queries using OpenAI",
   "main": "backend/index.js",
   "bin": {
     "nlp2sql": "./bin/nlp2sql.js"
@@ -15,8 +15,8 @@
     "url": "https://github.com/dramildodeja/nlp2sql.git"
   },
   "author": "Dramil M Dodeja",
-  "license": "MIT",
-  "keywords": ["nlp", "sql", "nosql", "text-to-sql", "dramil m dodeja", "dramil dodeja"],
+  "license": "FREE TO USE",
+  "keywords": ["nlp", "sql", "nosql", "text-to-sql", "openai", "dramil dodeja"],
   "dependencies": {
     "commander": "^11.0.0",
     "axios": "^1.7.0",
@@ -29,7 +29,8 @@
     "bin/",
     "examples/",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    ".env.template"
   ],
   "publishConfig": {
     "access": "public"
