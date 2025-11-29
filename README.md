@@ -1,6 +1,6 @@
 # nlp2sql
 
-Convert natural language into **SQL, NoSQL, or SOQL queries** using OpenAI.  
+Convert natural language into **SQL, NoSQL, or SOQL queries**.  
 Supports CLI, environment variables, Docker, Redis caching, and multiple query types.
 
 ---
