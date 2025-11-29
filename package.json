@@ -1,6 +1,6 @@
 {
   "name": "@dramildodeja/nlp2sql",
-  "version": "1.3.0",
+  "version": "1.6.0",
   "description": "Convert natural language into SQL or NoSQL queries using multiple AI providers",
   "main": "backend/index.js",
   "bin": {
@@ -16,7 +16,7 @@
   },
   "author": "Dramil M Dodeja",
   "license": "MIT",
-  "keywords": ["nlp", "sql", "nosql", "text-to-sql"],
+  "keywords": ["nlp", "sql", "nosql", "text-to-sql", "dramil m dodeja", "dramil dodeja"],
   "dependencies": {
     "commander": "^11.0.0",
     "axios": "^1.7.0",
